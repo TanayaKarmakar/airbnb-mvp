@@ -33,15 +33,17 @@ class PropertyController(
                 HttpStatus.CREATED)
     }
 
-    @PutMapping
-    fun updateProperty(): ResponseEntity<PropertyResponse>? {
-        return null
-    }
+//    @PutMapping
+//    fun updateProperty(): ResponseEntity<PropertyResponse>? {
+//        return null
+//    }
 
-    @DeleteMapping
+    @DeleteMapping("/{propertyId}")
     fun deleteProperty(
             @PathVariable propertyId: String
-    ): ResponseEntity<PropertyResponse>? {
-        return null
+    ): ResponseEntity<String>? {
+        val propertyId = propertyService.deleteProperty(propertyId)
+        val responseMessage = "Property with $propertyId successfully deleted"
+        return ResponseEntity(responseMessage, HttpStatus.OK)
     }
 }

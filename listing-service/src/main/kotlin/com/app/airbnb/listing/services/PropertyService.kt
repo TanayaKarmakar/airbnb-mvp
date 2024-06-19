@@ -16,7 +16,7 @@ interface PropertyService {
 
     fun updateProperty(): Property
 
-    fun deleteProperty(): Property
+    fun deleteProperty(propertyId: String): String
 }
 
 @Service
@@ -24,10 +24,14 @@ class PropertyServiceImpl(
         @Autowired val propertyRepository: PropertyRepository,
         @Autowired val photoUploadService: PhotoUploadService
         ): PropertyService {
-    override fun getPropertyById(propertyId: String): Property =
-        propertyRepository.findById(propertyId)
-                .map{it}
-                .orElse(throw NotFoundException(AppConstants.NOT_FOUND))
+    override fun getPropertyById(propertyId: String): Property {
+        val property = propertyRepository.findById(propertyId)
+                .map{it}.get()
+        if(!property.isActive)
+            throw NotFoundException(AppConstants.NOT_FOUND)
+        return property
+    }
+
 
     override fun addProperty(propertyRequest: PropertyCreationRequest): Property {
         val photoUrls = photoUploadService.uploadPhotos()
@@ -41,8 +45,11 @@ class PropertyServiceImpl(
         TODO("Not yet implemented")
     }
 
-    override fun deleteProperty(): Property {
-        TODO("Not yet implemented")
+    override fun deleteProperty(propertyId: String): String {
+        val property = getPropertyById(propertyId)
+        property.isActive = false
+        propertyRepository.save(property)
+        return propertyId
     }
 
 }

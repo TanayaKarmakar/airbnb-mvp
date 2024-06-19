@@ -11,25 +11,24 @@ class Property(
         @Id
         @GeneratedValue(strategy = GenerationType.UUID)
         val id: String,
-        val title: String,
-        val description: String,
-        //@OneToOne
+        var title: String,
+        var description: String,
         @JdbcTypeCode(SqlTypes.JSON)
         @Column(columnDefinition = "jsonb")
-        val address: Address,
+        var address: Address,
         @Enumerated(EnumType.STRING)
         val propertyType: PropertyType,
         @OneToMany(cascade = arrayOf(CascadeType.ALL))
         @JoinColumn(name = "property_id")
-        val photos: List<PropertyPhoto>?,
+        var photos: List<PropertyPhoto>?,
         @Enumerated(EnumType.STRING)
         val amenities: List<AmenityType>,
         @OneToMany(cascade = arrayOf(CascadeType.ALL))
         @JoinColumn(name = "property_id")
-        val propertyReviews: List<PropertyReview>?,
+        var propertyReviews: List<PropertyReview>?,
         @OneToMany(cascade = arrayOf(CascadeType.ALL))
         @JoinColumn(name = "property_id")
-        val propertyPrice: List<PropertyPricing>?,
-        val isActive: Boolean
+        var propertyPrice: List<PropertyPricing>?,
+        var isActive: Boolean
 )
 
