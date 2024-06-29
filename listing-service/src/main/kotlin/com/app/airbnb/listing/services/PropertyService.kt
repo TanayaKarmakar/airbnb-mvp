@@ -37,8 +37,8 @@ class PropertyServiceImpl(
         val photoUrls = photoUploadService.uploadPhotos()
         val propertyPhotos = photoUploadService.buildPropertyPhoto(photoUrls)
         val property = PropertyDTOEntityMapper.toPropertyEntity(propertyRequest, propertyPhotos)
-        propertyRepository.save(property)
-        return property
+        val createdProperty = propertyRepository.save(property)
+        return createdProperty
     }
 
     override fun updateProperty(): Property {

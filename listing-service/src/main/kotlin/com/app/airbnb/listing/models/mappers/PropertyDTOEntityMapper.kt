@@ -31,7 +31,7 @@ object PropertyDTOEntityMapper {
     fun toPropertyEntity(propertyRequest: PropertyCreationRequest, propertyPhotos: List<PropertyPhoto>): Property {
 
         val property = Property(
-                assignId(propertyRequest.id),
+                null.toString(),
                 propertyRequest.title,
                 propertyRequest.description,
                 propertyRequest.address,

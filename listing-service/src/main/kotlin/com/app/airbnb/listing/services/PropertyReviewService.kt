@@ -1,31 +1,83 @@
 package com.app.airbnb.listing.services
 
+import com.app.airbnb.listing.exception.BadRequestException
+import com.app.airbnb.listing.exception.NotFoundException
+import com.app.airbnb.listing.models.dtos.request.PropertyReviewRequest
+import com.app.airbnb.listing.models.entities.Property
+import com.app.airbnb.listing.models.entities.PropertyReview
+import com.app.airbnb.listing.models.mappers.PropertyReviewDTOEntityMapper
+import com.app.airbnb.listing.repositories.PropertyRepository
+import com.app.airbnb.listing.repositories.PropertyReviewRepository
+import com.app.airbnb.listing.utils.AppConstants
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
 
 interface PropertyReviewService {
-    fun addReviewForAProperty()
+    fun addReviewForAProperty(
+            propertyId: String,
+            propertyReviewRequest: PropertyReviewRequest
+    ): Property
 
-    fun getReviewsForAProperty()
+    fun getReviewsForAProperty(
+            propertyId: String
+    ): Property
 
-    fun updateReviewForAProperty()
+    fun updateReviewForAProperty(
+            propertyReviewRequest: PropertyReviewRequest
+    ): PropertyReview
 
     fun deleteReviewsForAProperty()
 }
 
+@Service
 class PropertyReviewServiceImpl(
         @Autowired
-        val propertyReviewService: PropertyReviewService
+        val propertyReviewRepository: PropertyReviewRepository,
+        @Autowired
+        val propertyService: PropertyService,
+        @Autowired
+        val propertyRepository: PropertyRepository
 ): PropertyReviewService {
-    override fun addReviewForAProperty() {
-        TODO("Not yet implemented")
+    override fun addReviewForAProperty(
+            propertyId: String,
+            propertyReviewRequest: PropertyReviewRequest): Property{
+        val property = propertyService.getPropertyById(propertyId)
+        val propertyReview = PropertyReviewDTOEntityMapper.toPropertyReviewEntity(propertyReviewRequest)
+        propertyReview.isActive = true
+        propertyReview.createdAt = System.currentTimeMillis()
+        if(property.propertyReviews.isNullOrEmpty()) {
+            property.propertyReviews = mutableListOf()
+        }
+        property.propertyReviews!!.add(propertyReview)
+        return propertyRepository.save(property)
     }
 
-    override fun getReviewsForAProperty() {
-        TODO("Not yet implemented")
+    override fun getReviewsForAProperty(
+            propertyId: String
+    ): Property {
+        return propertyService.getPropertyById(propertyId)
     }
 
-    override fun updateReviewForAProperty() {
-        TODO("Not yet implemented")
+    override fun updateReviewForAProperty(
+            propertyReviewRequest: PropertyReviewRequest
+    ): PropertyReview {
+        val propertyReviewOpt = propertyReviewRequest.id?.let { propertyReviewRepository.findById(it) }
+        if (propertyReviewOpt != null) {
+            if(!propertyReviewOpt.isPresent) {
+                throw NotFoundException("${AppConstants.NOT_FOUND} with Review ID ${propertyReviewRequest.id}" )
+            }
+
+            val propertyReview = propertyReviewOpt.get()
+
+            propertyReview.reviewTitle = propertyReviewRequest.reviewTitle
+            propertyReview.reviewDescription = propertyReviewRequest.reviewDescription
+            propertyReview.rating = propertyReviewRequest.rating
+            propertyReview.lastUpdatedAt = System.currentTimeMillis()
+            val updatedPropertyReview = propertyReviewRepository.save(propertyReview)
+            return updatedPropertyReview
+        }
+        throw BadRequestException(AppConstants.BAD_REQUEST)
+
     }
 
     override fun deleteReviewsForAProperty() {

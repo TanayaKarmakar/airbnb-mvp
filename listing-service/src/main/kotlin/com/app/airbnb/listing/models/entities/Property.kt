@@ -25,7 +25,7 @@ class Property(
         val amenities: List<AmenityType>,
         @OneToMany(cascade = arrayOf(CascadeType.ALL))
         @JoinColumn(name = "property_id")
-        var propertyReviews: List<PropertyReview>?,
+        var propertyReviews: MutableList<PropertyReview>?,
         @OneToMany(cascade = arrayOf(CascadeType.ALL))
         @JoinColumn(name = "property_id")
         var propertyPrice: List<PropertyPricing>?,

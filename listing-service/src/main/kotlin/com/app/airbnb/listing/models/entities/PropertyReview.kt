@@ -14,8 +14,10 @@ class PropertyReview(
         @GeneratedValue(strategy = GenerationType.UUID)
         val id: String,
         val reviewedBy: String,
-        val reviewTitle: String,
-        val reviewDescription: String,
-        val reviewedOn: Long,
-        val rating: Rating
+        var reviewTitle: String,
+        var reviewDescription: String,
+        var createdAt: Long?,
+        var lastUpdatedAt: Long,
+        var rating: Rating,
+        var isActive: Boolean
 )
