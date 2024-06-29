@@ -26,7 +26,10 @@ interface PropertyReviewService {
             propertyReviewRequest: PropertyReviewRequest
     ): PropertyReview
 
-    fun deleteReviewsForAProperty()
+    fun deleteReviewsForAProperty(
+            propertyId: String,
+            reviewId: String
+    )
 }
 
 @Service
@@ -55,7 +58,10 @@ class PropertyReviewServiceImpl(
     override fun getReviewsForAProperty(
             propertyId: String
     ): Property {
-        return propertyService.getPropertyById(propertyId)
+        val property = propertyService.getPropertyById(propertyId)
+        val propertyReviews = property.propertyReviews?.filter { it.isActive }?.toMutableList()
+        property.propertyReviews = propertyReviews
+        return property
     }
 
     override fun updateReviewForAProperty(
@@ -80,8 +86,18 @@ class PropertyReviewServiceImpl(
 
     }
 
-    override fun deleteReviewsForAProperty() {
-        TODO("Not yet implemented")
+    override fun deleteReviewsForAProperty(
+            propertyId: String,
+            reviewId: String
+    ) {
+        propertyService.getPropertyById(propertyId)
+        val propertyReviewOpt = propertyReviewRepository.findById(reviewId)
+        if(propertyReviewOpt.isEmpty || !propertyReviewOpt.get().isActive) {
+            throw NotFoundException("${AppConstants.NOT_FOUND} with Review ID ${reviewId}")
+        }
+        val propertyReview = propertyReviewOpt.get()
+        propertyReview.isActive = false
+        propertyReviewRepository.save(propertyReview)
     }
 
 }

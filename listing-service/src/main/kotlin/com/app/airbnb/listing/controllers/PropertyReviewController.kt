@@ -5,9 +5,11 @@ import com.app.airbnb.listing.models.dtos.response.PropertyReviewResponse
 import com.app.airbnb.listing.models.entities.PropertyReview
 import com.app.airbnb.listing.models.mappers.PropertyReviewDTOEntityMapper
 import com.app.airbnb.listing.services.PropertyReviewService
+import com.app.airbnb.listing.utils.AppConstants
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -54,11 +56,12 @@ class PropertyReviewController(
                 HttpStatus.OK)
     }
 
-    @GetMapping("/{reviewId}")
+    @DeleteMapping("/{reviewId}")
     fun deleteReviewForAProperty(
             @PathVariable propertyId: String,
             @PathVariable reviewId: String
-    ) {
-
+    ): ResponseEntity<String> {
+        propertyReviewService.deleteReviewsForAProperty(propertyId, reviewId)
+        return ResponseEntity(AppConstants.OPERATION_SUCCESSFUL, HttpStatus.OK)
     }
 }
